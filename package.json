@@ -105,10 +105,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/thiagobustamante/typescript-rest.git"
+    "url": "https://github.com/co-swagger/typescript-rest.git"
   },
   "bugs": {
-    "url": "https://github.com/thiagobustamante/typescript-rest/issues"
+    "url": "https://github.com/co-swagger/typescript-rest.git/issues"
   },
   "directories": {
     "lib": "dist",
