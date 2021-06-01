@@ -1,5 +1,7 @@
 'use strict';
 
+import { RequestHandler } from 'express';
+
 import { HttpMethod, ParserType, ServiceProcessor } from './server-types';
 
 export interface ServiceProperty {
@@ -7,6 +9,10 @@ export interface ServiceProperty {
     name: string;
     propertyType: any;
 }
+// 输入解密
+export type ServiceDecoder = RequestHandler;
+// 输出加密
+export type ServiceEncoder = (data: any) => any;
 
 /**
  * Metadata for REST service classes
@@ -27,6 +33,8 @@ export class ServiceClass {
     public properties: Map<string, ServiceProperty>;
     public isAbstract: boolean = false;
     public ignoreNextMiddlewares: boolean = false;
+    public decode: ServiceDecoder;
+    public encode: ServiceEncoder;
     constructor(targetClass: any) {
         this.targetClass = targetClass;
         this.methods = new Map<string, ServiceMethod>();

@@ -1,7 +1,7 @@
 {
-  "name": "typescript-rest",
+  "name": "@colter/typescript-rest",
   "version": "3.0.2",
-  "description": "A Library to create RESTFul APIs with Typescript",
+  "description": "A Library to create RESTFul APIs with Typescript. forked from thiagobustamante/typescript-rest",
   "author": "Thiago da Rosa de Bustamante <thiago@cruxframework.org>",
   "keywords": [
     "API",

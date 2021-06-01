@@ -8,7 +8,7 @@ import { NextFunction, Request, Response } from 'express';
 import * as _ from 'lodash';
 import * as multer from 'multer';
 import * as Errors from './model/errors';
-import { ServiceClass, ServiceMethod } from './model/metadata';
+import { ServiceClass, ServiceDecoder, ServiceEncoder, ServiceMethod } from './model/metadata';
 import {
     FileLimits, HttpMethod, ParameterConverter,
     ParserType, ServiceAuthenticator, ServiceContext, ServiceFactory
@@ -41,6 +41,8 @@ export class ServerContainer {
     public serviceFactory: ServiceFactory = new DefaultServiceFactory();
     public paramConverters: Map<Function, ParameterConverter> = new Map<Function, ParameterConverter>();
     public router: express.Router;
+    public decode: ServiceDecoder;
+    public encode: ServiceEncoder;
 
     private debugger = {
         build: debug('typescript-rest:server-container:build'),
@@ -58,11 +60,13 @@ export class ServerContainer {
         target = this.serviceFactory.getTargetClass(target);
         if (!this.serverClasses.has(target)) {
             this.debugger.build('Registering a new service class, %o', target);
-            this.serverClasses.set(target, new ServiceClass(target));
+            const sc = new ServiceClass(target);
+            sc.decode = this.decode;
+            sc.encode = this.encode;
+            this.serverClasses.set(target, sc);
             this.inheritParentClass(target);
         }
-        const serviceClass: ServiceClass = this.serverClasses.get(target);
-        return serviceClass;
+        return this.serverClasses.get(target);
     }
 
     public registerServiceMethod(target: Function, methodName: string): ServiceMethod {
@@ -371,6 +375,10 @@ export class ServerContainer {
     private buildParserMiddlewares(serviceClass: ServiceClass, serviceMethod: ServiceMethod): Array<express.RequestHandler> {
         const result: Array<express.RequestHandler> = new Array<express.RequestHandler>();
         const bodyParserOptions = serviceMethod.bodyParserOptions || serviceClass.bodyParserOptions;
+
+        if (serviceClass.decode) {
+            result.push(serviceClass.decode);
+        }
 
         if (serviceMethod.mustParseCookies) {
             this.debugger.build('Registering cookie parser middleware for method <%s>.', serviceMethod.name);

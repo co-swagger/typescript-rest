@@ -69,7 +69,10 @@ export class ServiceInvoker {
         if (this.debugger.enabled) {
             this.debugger('Invoking service method <%s> with params: %j', this.serviceMethod.name, args);
         }
-        const result = await toCall.apply(serviceObject, args);
+        let result = await toCall.apply(serviceObject, args);
+        if (this.serviceClass.encode) {
+            result = this.serviceClass.encode(result);
+        }
         if (this.postProcessors.length) {
             await this.runPostProcessors(context);
         }
@@ -189,8 +192,8 @@ export class ServiceInvoker {
                     }
                     break;
                 default:
-                    value === null 
-                        ? context.response.send(value) 
+                    value === null
+                        ? context.response.send(value)
                         : await this.sendComplexValue(context, value);
             }
         } else {

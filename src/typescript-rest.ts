@@ -13,6 +13,6 @@ export * from './authenticator/passport';
 
 export { Return };
 export { Errors };
-export { DefaultServiceFactory } from './server/server-container';
+export { DefaultServiceFactory, ServerContainer } from './server/server-container';
 
 ServerConfig.configure();
