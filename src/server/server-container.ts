@@ -43,6 +43,8 @@ export class ServerContainer {
     public router: express.Router;
     public decode: ServiceDecoder;
     public encode: ServiceEncoder;
+    public beforeFilter: Array<express.RequestHandler> = [];
+    public afterFilter: Array<express.RequestHandler> = [];
 
     private debugger = {
         build: debug('typescript-rest:server-container:build'),
@@ -157,9 +159,15 @@ export class ServerContainer {
         }
 
         let args: Array<any> = [serviceMethod.resolvedPath];
+        if (this.beforeFilter.length) {
+            args.push(...this.beforeFilter);
+        }
         args = args.concat(this.buildSecurityMiddlewares(serviceClass, serviceMethod));
         args = args.concat(this.buildParserMiddlewares(serviceClass, serviceMethod));
         args.push(this.buildServiceMiddleware(serviceMethod, serviceClass));
+        if (this.afterFilter) {
+            args.push(...this.afterFilter);
+        }
         switch (serviceMethod.httpMethod) {
             case HttpMethod.GET:
                 this.router.get.apply(this.router, args);
